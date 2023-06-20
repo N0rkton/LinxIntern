@@ -8,7 +8,6 @@ import (
 	"fmt"
 	"io"
 	"os"
-	"strconv"
 )
 
 type product struct {
@@ -25,9 +24,9 @@ func main() {
 	if err == nil {
 		fmt.Printf("max price from json file: %d, max raiting: %d\n", maxPrice, maxRating)
 	}
-	maxRating, maxPrice, err = readCSV(*csvFlag)
+	maxRatingCSV, maxPriceCSV, err := readCSV(*csvFlag)
 	if err == nil {
-		fmt.Printf("max price from csv file: %d, max raiting: %d", maxPrice, maxRating)
+		fmt.Printf("max price from csv file: %s, max raiting: %s", maxPriceCSV, maxRatingCSV)
 	}
 
 }
@@ -53,13 +52,13 @@ func readJSON(path string) (int, int, error) {
 	}
 	return maxPrice, maxRating, nil
 }
-func readCSV(path string) (int, int, error) {
+func readCSV(path string) (string, string, error) {
 	f, errF := os.Open(path)
 	if errF != nil {
-		return 0, 0, errF
+		return "", "", errF
 	}
 	defer f.Close()
-	var maxPrice, maxRating int
+	var maxPrice, maxRating string
 	csvReader := csv.NewReader(f)
 	csvReader.Read()
 	for {
@@ -68,22 +67,13 @@ func readCSV(path string) (int, int, error) {
 			return maxPrice, maxRating, nil
 		}
 		if err != nil {
-			return 0, 0, err
+			return "", "", err
 		}
-
-		tmpRating, ok := strconv.Atoi(rec[2])
-		if ok != nil {
-			return 0, 0, ok
+		if rec[2] > maxRating {
+			maxRating = rec[2]
 		}
-		tmpPrice, ok := strconv.Atoi(rec[1])
-		if ok != nil {
-			return 0, 0, ok
-		}
-		if tmpRating > maxRating {
-			maxRating = tmpRating
-		}
-		if tmpPrice > maxPrice {
-			maxPrice = tmpPrice
+		if rec[1] > maxPrice {
+			maxPrice = rec[1]
 		}
 	}
 }
