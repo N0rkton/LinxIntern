@@ -41,9 +41,9 @@ func readJSON(path string) (int, int, error) {
 	var maxPrice, maxRating int
 	for s.Scan() {
 		line := s.Text()
-		if len(line) > 3 {
-			line = line[0 : len(line)-1]
-		}
+
+		line = line[0 : len(line)-1]
+
 		if err := json.Unmarshal([]byte(line), &tmp); err != nil {
 			continue
 		}
