@@ -40,7 +40,11 @@ func readJSON(path string) (int, int, error) {
 	var tmp product
 	var maxPrice, maxRating int
 	for s.Scan() {
-		if err := json.Unmarshal(s.Bytes(), &tmp); err != nil {
+		line := s.Text()
+		if len(line) > 3 {
+			line = line[0 : len(line)-1]
+		}
+		if err := json.Unmarshal([]byte(line), &tmp); err != nil {
 			continue
 		}
 		if tmp.Rating > maxRating {
